@@ -21,10 +21,9 @@
                   <div class="small" v-show="choose[item.index-1]===index"></div>
                 </div>
                 <div class="tip">{{choice}}</div>
-                <!-- 还在逻辑混乱当中 -->
                 <img
                   :src="correct"
-                  v-show="!allow[item.index-1] &&index===optionSwitch[item.answer]"
+                  v-show="index===optionSwitch[item.answer] && !allow[item.index-1] "
                 />
                 <img :src="wrong" v-show="!allow[item.index-1] &&answers[item.index-1]!==index && index===choose[item.index-1]" />
               </div>
@@ -34,7 +33,7 @@
         <div class="swiper-pagination swiper-pagination-bullets" slot="pagination"></div>
       </swiper>
     </div>
-    <div class="submit" @click="submit">提交</div>
+    <div class="submit" @click="submit" v-show="choose.length===5">提交</div>
     <div class="bg">
       <img :src="bg" />
     </div>
