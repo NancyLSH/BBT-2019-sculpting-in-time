@@ -229,6 +229,7 @@ export default {
 }
 .questions .bg img {
   width: 100%;
+  height: 54vw;
 }
 .swiper .main .options .active {
   background-color: rgba(216, 212, 196, 0.06);
