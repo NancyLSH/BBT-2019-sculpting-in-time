@@ -1,26 +1,32 @@
 <template>
   <div class="questions">
     <div class="swiper">
-        <div class="smoke">
-            <img :src="smoke"/>
-        </div>
+      <div class="smoke">
+        <img :src="smoke" />
+      </div>
       <swiper :options="swiperOption">
-        <swiper-slide v-for="n in 5" :key="n">
-          <div class="title">{{n}}/5</div>
+        <swiper-slide v-for="(item,index) in list" :key="item.id">
+          <div class="title">{{index+1}}/5</div>
           <div class="main">
-            <div class="head">《狗十三》中女主养的小狗叫 什么名字？</div>
+            <div class="head">{{item.question}}</div>
             <div class="options">
               <div
                 class="item"
-                v-for="i in 4"
-                :key="i"
-                @click="check(n,i)"
-                v-bind:class="{active:choose[n-1] === i}"
+                v-for="(choice,index) in options[index]"
+                :key="index"
+                @click="allow[item.index-1] && check(item.index,index,item.id)"
+                v-bind:class="{active:choose[item.index-1] === index}"
               >
                 <div class="circle">
-                  <div class="small" v-show="choose[n-1]===i"></div>
+                  <div class="small" v-show="choose[item.index-1]===index"></div>
                 </div>
-                <div class="tip">A.伽利略</div>
+                <div class="tip">{{choice}}</div>
+                <!-- 还在逻辑混乱当中 -->
+                <img
+                  :src="correct"
+                  v-show="!allow[item.index-1] &&index===optionSwitch[item.answer]"
+                />
+                <img :src="wrong" v-show="!allow[item.index-1] &&answers[item.index-1]!==index && index===choose[item.index-1]" />
               </div>
             </div>
           </div>
@@ -36,17 +42,29 @@
 </template>
 
 <script>
-// import $ from 'jquery'
+import $ from "jquery";
 import bg from "../assets/bg.png";
 import smoke from "../assets/smoke.png";
+import correct from "../assets/correct.png";
+import wrong from "../assets/wrong.png";
+const baseUrl = "http://111.230.183.100:5000";
+const optionSwitch = {
+  A: 0,
+  B: 1,
+  C: 2,
+  D: 3
+};
 
 export default {
   name: "index",
   data() {
     return {
-      bg,
-      smoke,
+      list: [],
+      options: [],
+      allow: [true, true, true, true, true],
       choose: [],
+      answers: [],
+      correctList: [],
       swiperOption: {
         pagination: {
           el: ".swiper-pagination",
@@ -55,18 +73,52 @@ export default {
             return `<span class="${className} swiper-pagination-bullet-custom"></span>`;
           }
         }
-      }
+      },
+      optionSwitch: optionSwitch,
+      bg,
+      smoke,
+      correct,
+      wrong
     };
   },
   mounted() {
-    // $.ajax({
-    //     url:"",
-    // })
+    $.ajax({
+      url: baseUrl + "/getList",
+      type: "GET",
+      success: res => {
+        let i = 0;
+        this.list = res.map(item => {
+          return {
+            ...item,
+            index: ++i
+          };
+        });
+        this.options = this.list.map(item => {
+          return [item.A, item.B, item.C, item.D];
+        });
+        this.answers = this.list.map(item => optionSwitch[item.answer]);
+      }
+    });
   },
   methods: {
-    submit() {},
-    check(n, i) {
+    submit() {
+      $.ajax({
+        url: baseUrl + "/check",
+        type: "POST",
+        data: {
+          correctNum: this.correctList.length
+        },
+        success: res => {
+          console.log({ res });
+        }
+      });
+    },
+    check(n, i, id) {
+      this.$set(this.allow, n - 1, false);
       this.$set(this.choose, n - 1, i);
+      if (this.choose[n - 1] === this.answers[n - 1]) {
+        this.correctList.push(id);
+      }
     }
   }
 };
@@ -81,6 +133,15 @@ export default {
   color: #d8d4c4;
   width: fit-content;
   padding: 10%;
+}
+.questions .smoke {
+  width: 100%;
+  text-align: right;
+  position: fixed;
+  top: 70vw;
+}
+.questions .smoke img {
+  width: 60%;
 }
 .swiper-wrapper {
   margin-bottom: 25vw;
@@ -172,5 +233,10 @@ export default {
 }
 .swiper .main .options .active {
   background-color: rgba(216, 212, 196, 0.06);
+}
+.questions .options .item img {
+  width: 7%;
+  position: absolute;
+  right: 7%;
 }
 </style>
