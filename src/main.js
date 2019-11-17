@@ -10,10 +10,12 @@ import result from "./pages/result.vue"
 //路由
 const routes = [{
     path: '/index',
+    name:"index",
     component: index
   },
   {
     path: '/result',
+    name:"result",
     component: result
   }
 ]

@@ -9,9 +9,9 @@
     <div class="content">
       <div class="title">个人战绩</div>
       <div class="main">
-        <div class="tip">您共答对&nbsp;&nbsp;3&nbsp;&nbsp;题</div>
-        <div class="tip">正确率为&nbsp;&nbsp;60&nbsp;&nbsp;%</div>
-        <div class="res">恭喜你增加许愿值&nbsp;20&nbsp;%</div>
+        <div class="tip">您共答对&nbsp;&nbsp;{{result.correctNum}}&nbsp;&nbsp;题</div>
+        <div class="tip">正确率为&nbsp;&nbsp;{{result.accuracy}}&nbsp;&nbsp;%</div>
+        <div class="res">恭喜你增加许愿值&nbsp;{{result.wish}}&nbsp;%</div>
         <div class="yellow">收集许愿值可以用来兑换奖品</div>
       </div>
       <div class="btns">
@@ -26,29 +26,23 @@
 </template>
 
 <script>
-import $ from "jquery";
 import bg from "../assets/bg.png";
 import leftSmoke from "../assets/left-smoke.png";
-import rightSmoke from "../assets/smoke.png";
-const baseUrl = "http://111.230.183.100:5000";
+import rightSmoke from "../assets/right-smoke.png";
 
 export default {
   name: "result",
   data() {
     return {
+      result:{},
       bg,
       leftSmoke,
       rightSmoke
     };
   },
   mounted() {
-    $.ajax({
-      url: baseUrl + "/commit",
-      method:"GET",
-      success:res=>{
-          console.log({res});
-      }
-    });
+    this.result = this.$route.params.res;
+    console.log(this.result);
   },
   methods: {
     again() {
@@ -74,12 +68,12 @@ export default {
 .result .right {
   position: fixed;
   width: 100%;
-  top: 53%;
+  top: 45%;
   text-align: right;
   right: 0;
 }
 .result .right img {
-  width: 65%;
+  width: 50%;
 }
 .result .content {
   width: 68%;

@@ -14,14 +14,24 @@
                 class="item"
                 v-for="(choice,index) in options[index]"
                 :key="index"
-                @click="check(item.id,index)"
+                @click="allow[item.index]&&check(item.id,index,item.index)"
+                v-bind:class="{active:answerList[item.index][index]&&answerList[item.index][index]==='correct'}"
               >
                 <div class="circle">
-                  <div class="small" v-show="false"></div>
+                  <div
+                    class="small"
+                    v-show="answerList[item.index][index]&&answerList[item.index][index]==='correct'"
+                  ></div>
                 </div>
                 <div class="tip">{{choice}}</div>
-                <img :src="correct" v-show="false" />
-                <img :src="wrong" v-show="false" />
+                <img
+                  :src="correct"
+                  v-show="answerList[item.index][index]&&answerList[item.index][index]==='correct'"
+                />
+                <img
+                  :src="wrong"
+                  v-show="answerList[item.index][index]&&answerList[item.index][index]==='wrong'"
+                />
               </div>
             </div>
           </div>
@@ -30,10 +40,14 @@
       </swiper>
     </div>
     <div style="padding-bottom:20vw">
-      <div class="btn submit" @click="submit">提交</div>
+      <div class="btn submit" @click="submit" v-show="answerList[4].length">提交</div>
     </div>
     <div class="bg">
       <img :src="bg" />
+    </div>
+    <div class="tip" v-show="showTip">
+      <div class="shadow"></div>
+      <div class="box"></div>
     </div>
   </div>
 </template>
@@ -56,9 +70,11 @@ export default {
   name: "index",
   data() {
     return {
+      showTip: true,
       list: [],
       options: [],
       allow: [true, true, true, true, true],
+      answerList: [[], [], [], [], []],
       swiperOption: {
         pagination: {
           el: ".swiper-pagination",
@@ -78,6 +94,7 @@ export default {
     $.ajax({
       url: baseUrl + "/getList",
       type: "GET",
+      xhrFields: { withCredentials: true },
       success: res => {
         let i = 0;
         this.list = res.map(item => {
@@ -86,7 +103,6 @@ export default {
             index: i++
           };
         });
-        console.log("list", this.list);
         this.options = this.list.map(item => {
           return [item.A, item.B, item.C, item.D];
         });
@@ -95,22 +111,46 @@ export default {
   },
   methods: {
     submit() {
-      this.$router.push("/result");
+      $.ajax({
+        url: baseUrl + "/commit",
+        method: "GET",
+        xhrFields: { withCredentials: true },
+        success: res => {
+          this.$router.push({
+            name:"result",
+            params:{res:res}
+          })
+          console.log({ res });
+        }
+      });
     },
-    check(question_id, index) {
+    check(question_id, index, numIndex) {
       let option = optionSwitch[index];
-      console.log({ option });
       $.ajax({
         url: baseUrl + "/check",
         type: "POST",
+        xhrFields: { withCredentials: true },
         data: {
           question_id,
           option
         },
         success: res => {
-          console.log({ res });
+          this.allow[numIndex] = false;
+          let correctIndex = this.findKey(res.answer);
+          this.$set(this.answerList[numIndex], correctIndex, "correct");
+          if (res.errcode === 1) {
+            this.$set(this.answerList[numIndex], index, "wrong");
+          }
+          if (res.message) {
+            console.log("message", res.message);
+          }
         }
       });
+    },
+    findKey(value, compare = (a, b) => a === b) {
+      return Object.keys(optionSwitch).find(k =>
+        compare(optionSwitch[k], value)
+      );
     }
   }
 };
@@ -137,7 +177,7 @@ export default {
   width: 60%;
 }
 .swiper-wrapper {
-  margin-bottom: 25vw;
+  margin-bottom: 15vw;
 }
 .swiper .main {
   width: 100%;
