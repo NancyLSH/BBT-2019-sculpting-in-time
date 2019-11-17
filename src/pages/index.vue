@@ -14,18 +14,14 @@
                 class="item"
                 v-for="(choice,index) in options[index]"
                 :key="index"
-                @click="allow[item.index-1] && check(item.index,index,item.id)"
-                v-bind:class="{active:choose[item.index-1] === index}"
+                @click="check(item.id,index)"
               >
                 <div class="circle">
-                  <div class="small" v-show="choose[item.index-1]===index"></div>
+                  <div class="small" v-show="false"></div>
                 </div>
                 <div class="tip">{{choice}}</div>
-                <img
-                  :src="correct"
-                  v-show="index===optionSwitch[item.answer] && !allow[item.index-1] "
-                />
-                <img :src="wrong" v-show="!allow[item.index-1] &&answers[item.index-1]!==index && index===choose[item.index-1]" />
+                <img :src="correct" v-show="false" />
+                <img :src="wrong" v-show="false" />
               </div>
             </div>
           </div>
@@ -33,7 +29,7 @@
         <div class="swiper-pagination swiper-pagination-bullets" slot="pagination"></div>
       </swiper>
     </div>
-    <div class="submit" @click="submit" v-show="choose.length===5">提交</div>
+    <div class="btn submit" @click="submit">提交</div>
     <div class="bg">
       <img :src="bg" />
     </div>
@@ -48,10 +44,10 @@ import correct from "../assets/correct.png";
 import wrong from "../assets/wrong.png";
 const baseUrl = "http://111.230.183.100:5000";
 const optionSwitch = {
-  A: 0,
-  B: 1,
-  C: 2,
-  D: 3
+  0: "A",
+  1: "B",
+  2: "C",
+  3: "D"
 };
 
 export default {
@@ -61,9 +57,6 @@ export default {
       list: [],
       options: [],
       allow: [true, true, true, true, true],
-      choose: [],
-      answers: [],
-      correctList: [],
       swiperOption: {
         pagination: {
           el: ".swiper-pagination",
@@ -73,7 +66,6 @@ export default {
           }
         }
       },
-      optionSwitch: optionSwitch,
       bg,
       smoke,
       correct,
@@ -89,35 +81,34 @@ export default {
         this.list = res.map(item => {
           return {
             ...item,
-            index: ++i
+            index: i++
           };
         });
+        console.log("list", this.list);
         this.options = this.list.map(item => {
           return [item.A, item.B, item.C, item.D];
         });
-        this.answers = this.list.map(item => optionSwitch[item.answer]);
       }
     });
   },
   methods: {
     submit() {
+      this.$router.push("/result");
+    },
+    check(question_id, index) {
+      let option = optionSwitch[index];
+      console.log({ option });
       $.ajax({
         url: baseUrl + "/check",
         type: "POST",
         data: {
-          correctNum: this.correctList.length
+          question_id,
+          option
         },
         success: res => {
           console.log({ res });
         }
       });
-    },
-    check(n, i, id) {
-      this.$set(this.allow, n - 1, false);
-      this.$set(this.choose, n - 1, i);
-      if (this.choose[n - 1] === this.answers[n - 1]) {
-        this.correctList.push(id);
-      }
     }
   }
 };
@@ -132,6 +123,7 @@ export default {
   color: #d8d4c4;
   width: fit-content;
   padding: 10%;
+  font-weight: 500;
 }
 .questions .smoke {
   width: 100%;
@@ -156,6 +148,7 @@ export default {
   width: 83%;
   margin: auto;
   margin-bottom: 7%;
+  font-weight: 400;
 }
 .swiper .main .options {
   display: flex;
@@ -205,35 +198,13 @@ export default {
 .swiper-pagination-bullet-custom.swiper-pagination-bullet-active {
   background: #104075;
 }
-.submit {
-  width: 34%;
-  height: 9vw;
-  border-radius: 2vw;
-  border: #a59f59 solid 1px;
-  font-size: 4vw;
-  text-indent: 1.5vw;
-  letter-spacing: 3vw;
-  line-height: 9vw;
-  color: #ffffff;
-  margin: 10vw auto 20vw auto;
-  text-align: center;
-  position: relative;
-  z-index: 2;
-}
-.questions .bg {
-  width: 100%;
-  position: fixed;
-  bottom: 0;
-  z-index: 0;
-  display: flex;
-}
-.questions .bg img {
-  width: 100%;
-  height: 54vw;
-}
 .swiper .main .options .active {
   background-color: rgba(216, 212, 196, 0.06);
 }
+.submit {
+  margin: 10vw auto 20vw auto;
+}
+
 .questions .options .item img {
   width: 7%;
   position: absolute;
