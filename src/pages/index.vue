@@ -74,7 +74,7 @@ export default {
       list: [],
       options: [],
       allow: [true, true, true, true, true],
-      answerList: [[], [], [], [], []],
+      answerList: [[""], [], [], [], []],
       swiperOption: {
         pagination: {
           el: ".swiper-pagination",

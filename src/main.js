@@ -6,7 +6,6 @@ import VueRouter from 'vue-router'
 import 'swiper/dist/css/swiper.css'
 import index from "./pages/index.vue"
 import result from "./pages/result.vue"
-import 'path/to/vconsole.min.d.ts';
 
 //路由
 const routes = [{

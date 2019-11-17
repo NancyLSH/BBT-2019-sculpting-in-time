@@ -4,6 +4,7 @@
   </div>
 </template>
 
+
 <script>
 export default {
   name: "app",
@@ -18,7 +19,7 @@ export default {
   margin: 0;
   padding: 0;
 }
-div{
+div {
   font-weight: 100;
 }
 html,
