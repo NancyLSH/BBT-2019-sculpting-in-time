@@ -64,7 +64,7 @@ export default {
 }
 .result .left {
   width: 100%;
-  position: absolute;
+  position: fixed;
   top: 5%;
   left: 0;
 }

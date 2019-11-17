@@ -29,7 +29,9 @@
         <div class="swiper-pagination swiper-pagination-bullets" slot="pagination"></div>
       </swiper>
     </div>
-    <div class="btn submit" @click="submit">提交</div>
+    <div style="padding-bottom:20vw">
+      <div class="btn submit" @click="submit">提交</div>
+    </div>
     <div class="bg">
       <img :src="bg" />
     </div>
@@ -202,7 +204,7 @@ export default {
   background-color: rgba(216, 212, 196, 0.06);
 }
 .submit {
-  margin: 10vw auto 20vw auto;
+  margin: 10vw auto 0vw auto;
 }
 
 .questions .options .item img {
