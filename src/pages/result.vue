@@ -29,24 +29,37 @@
 import bg from "../assets/bg.png";
 import leftSmoke from "../assets/left-smoke.png";
 import rightSmoke from "../assets/right-smoke.png";
+import apis from "../API/apis";
 
 export default {
   name: "result",
   data() {
     return {
-      result:{},
+      result: {},
+      allow: false,
       bg,
       leftSmoke,
       rightSmoke
     };
   },
   mounted() {
-    this.result = this.$route.params.res;
-    console.log(this.result);
+    apis.checkTime(res => {
+      if (res.errcode === 0) {
+        this.result = this.$route.params.res;
+        this.allow = true;
+      }
+    });
   },
   methods: {
     again() {
-      this.$router.push("/index");
+      if (this.allow) {
+        this.$router.push({
+          name:'index',
+          params:{
+            showTip:false
+          }
+        });
+      }
     }
   }
 };
