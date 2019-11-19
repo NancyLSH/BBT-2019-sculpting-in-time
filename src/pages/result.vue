@@ -43,6 +43,7 @@ export default {
     };
   },
   mounted() {
+    apis.wxshare();
     apis.checkTime(res => {
       if (res.errcode === 0) {
         this.result = this.$route.params.res;
